@@ -1,0 +1,1031 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "username",
+        "type": "string"
+      }
+    ],
+    "name": "addUserToWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      }
+    ],
+    "name": "closeIssueNoSolver",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "prize",
+        "type": "uint256"
+      }
+    ],
+    "name": "createIssue",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "GitHubStaking__CannotDeclareYourselfWinner",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GitHubStaking__CreatorRightsOnly",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GitHubStaking__DeductionError",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GitHubStaking__IssueAlreadySolved",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GitHubStaking__IssueCreatorCannotStake",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      }
+    ],
+    "name": "GitHubStaking__IssueDoesNotExist",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GitHubStaking__IssueHasStakers",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GitHubStaking__MinAllowedBalanceReached",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GitHubStaking__NoWithdrawals",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GitHubStaking__NotEnoughAmtSent",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GitHubStaking__OwnerRightsOnly",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      }
+    ],
+    "name": "GitHubStaking__UnsuccessfullTransfer",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GitHubStaking__WrongSolverError",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "prize",
+        "type": "uint256"
+      }
+    ],
+    "name": "IssueCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "pullReqId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "solver",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "prize",
+        "type": "uint256"
+      }
+    ],
+    "name": "IssueSolved",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pullReqIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pullReqId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "solver",
+        "type": "address"
+      }
+    ],
+    "name": "markSolved",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "prize",
+        "type": "uint256"
+      }
+    ],
+    "name": "raiseIssuePrize",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "exchangeAmt",
+        "type": "uint256"
+      }
+    ],
+    "name": "requestTokens",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "hardValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "setHardLimit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pullReqId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amt",
+        "type": "uint256"
+      }
+    ],
+    "name": "stakeOnIssue",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "pullReqId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "staker",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amt",
+        "type": "uint256"
+      }
+    ],
+    "name": "StakePlaced",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      }
+    ],
+    "name": "updateAccessedFreeTokens",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdraw_reward",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pullReqIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawStake",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DEDUCTION_FACTOR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "staker",
+        "type": "address"
+      }
+    ],
+    "name": "getBasicWalletDetails",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "gitUsername",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lostStakeCount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "wonStakeCount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCurrentPriceOfWei",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "total",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "count",
+        "type": "uint256"
+      }
+    ],
+    "name": "getDeductionRate",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "approx_amt",
+        "type": "uint256"
+      }
+    ],
+    "name": "getEstDeductionRateOnIssue",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "exchangeAmt",
+        "type": "uint256"
+      }
+    ],
+    "name": "getGSTValueForExchangeValue",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getHardLimit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getIssue",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "prize",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "solved",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "solver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "stakeCount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalStakeAmt",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getIssueCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "staker",
+        "type": "address"
+      }
+    ],
+    "name": "getIssueStats",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalPriceAmt_SetByMe",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "openPriceAmt_SetByMe",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalIssues_SetByMe",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "openIssues_SetByMe",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "staker",
+        "type": "address"
+      }
+    ],
+    "name": "getRewardsWalletDetails",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "rewardsEarned",
+        "type": "uint256"
+      },
+      {
+        "internalType": "int256",
+        "name": "withdraw_proceedings",
+        "type": "int256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lost_refund",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getSoldTokens",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "getStake",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "pullReqIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pullReqId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "staker",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amt",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getStakeCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "staker",
+        "type": "address"
+      }
+    ],
+    "name": "getStakingWalletDetails",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalAmtStaked",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "openAmtStaked",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalStakes",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "openStakes",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTotalDeductions",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTotalRiased",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "repoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "issueId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getTotalStakeAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "HARD_LIMIT",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "i_owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "repos",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "issueCount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "s_token",
+    "outputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "wallets",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "gitUsername",
+        "type": "string"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "lostStakeCount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "wonStakeCount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalAmtStaked",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "openAmtStaked",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalStakes",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "openStakes",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "rewardsEarned",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "withdraw_proceedings",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lost_refund",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct GitHubStaking.WalletStats",
+        "name": "stats",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "totalPriceAmt_SetByMe",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "openPriceAmt_SetByMe",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalIssues_SetByMe",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "openIssues_SetByMe",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct GitHubStaking.IssueStats",
+        "name": "issueStats",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bool",
+        "name": "accessedFreeTokens",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
