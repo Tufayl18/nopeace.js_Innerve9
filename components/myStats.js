@@ -267,7 +267,7 @@ export default function MyStatsCard() {
                 </div>
                 <div>
                     <button className={styles.WithdrawButton} onClick={approveTokens}>
-                        {txStatus ? txStatus : "Approve 1000 GST"}
+                        {txStatus ? txStatus : "Approve 10 GST"}
                     </button>
                 </div>
 
