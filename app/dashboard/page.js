@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState, useCallback } from "react"
 import axios from "axios"
-import { useRouter } from "next/navigation" // Import useRouter from next/router
+import { useRouter } from "next/navigation" 
 import styles from "../styles.module.css"
 import MyStatsCard from "@/components/myStats"
 import ChatBot from "@/components/chatbot"
@@ -13,8 +13,7 @@ export default function Dashboard() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [globalRepos, setGlobalRepos] = useState([])
-  const router = useRouter() // Initialize useRouter
-
+  const router = useRouter() 
   let LStoken
   useEffect(() => {
     const fetchRepos = async () => {
@@ -55,12 +54,11 @@ export default function Dashboard() {
         setLoading(true)
         try {
           if(LStoken){
-            // Search user's repositories
+            
           const filtered = repos.filter((repo) =>
             repo.name.toLowerCase().includes(query.toLowerCase()),
           )
 
-          // Fetch global repositories if the search term is provided
           const globalResponse = await axios.get(
             `https://api.github.com/search/repositories?q=${query}+in:name`,
             {
@@ -71,7 +69,6 @@ export default function Dashboard() {
           )
           setGlobalRepos(globalResponse.data.items)
 
-          // Update filteredRepos to show local repositories and, if empty, global repositories
           setFilteredRepos(
             filtered.length > 0 ? filtered : globalResponse.data.items,
           )
@@ -140,7 +137,7 @@ export default function Dashboard() {
                   <a
                     href={`/repository/${repo.owner.login}/${repo.name}`}
                     onClick={(e) => {
-                      e.preventDefault() // Prevent default anchor behavior
+                      e.preventDefault() 
                       handleRepoClick(repo.owner.login, repo.name)
                     }}
                     style={{ color: "inherit", textDecoration: "none" }}
@@ -176,7 +173,7 @@ export default function Dashboard() {
                       <a
                         href={`/repository/${repo.owner.login}/${repo.name}`}
                         onClick={(e) => {
-                          e.preventDefault() // Prevent default anchor behavior
+                          e.preventDefault() 
                           handleRepoClick(repo.owner.login, repo.name)
                         }}
                         style={{ color: "inherit", textDecoration: "none" }}
