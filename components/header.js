@@ -19,7 +19,8 @@ export default function Header({ handleWallet, account }) {
                         /></div>
                     <Link href={`/dashboard`}><div>Dashboard</div></Link>
                     <Link href={`/resume`}><div>My Statistics</div></Link>
-                    <Link href={`https://discord.gg/RemgRwM5`}><div>Community</div></Link>
+                    {/* <Link href={`https://discord.gg/RemgRwM5`}><div>Community</div></Link> */}
+                    <div>Community</div>
                     <Link href={`/docs`}><div>Docs</div></Link>
                 </div>
                 <div className={styles.HeaderChild2}>

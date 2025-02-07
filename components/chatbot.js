@@ -1,2 +1,2 @@
-const Chatbot = () => {
+export default function Chatbot ()  {
 }
