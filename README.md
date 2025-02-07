@@ -1,6 +1,5 @@
 # GitStake: Stake, Solve, Earn.
 
-
 ## Introduction
 
 GitStake is a decentralized platform designed to transform how developers contribute to open-source projects. Open-source development drives innovation globally, but it faces significant challenges like low engagement, unresolved critical issues, and a lack of fair rewards for contributors. GitStake tackles these problems by combining blockchain technology, its unique staking mechanism, and its own ERC20 token, _GitStake Token (GST)_, to create a fair, transparent, and efficient system.
