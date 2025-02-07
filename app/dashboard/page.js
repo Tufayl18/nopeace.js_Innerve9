@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState, useCallback } from "react"
 import axios from "axios"
-import { useRouter } from "next/navigation" 
+import { useRouter } from "next/navigation"
 import styles from "../styles.module.css"
 import MyStatsCard from "@/components/myStats"
 import ChatBot from "@/components/chatbot"
@@ -13,12 +13,14 @@ export default function Dashboard() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [globalRepos, setGlobalRepos] = useState([])
-  const router = useRouter() 
-  let LStoken
+  const [LStoken, setLStoken] = useState(() =>
+    localStorage.getItem("githubAccessToken"),
+  )
+
+  const router = useRouter()
   useEffect(() => {
     const fetchRepos = async () => {
       try {
-        LStoken = localStorage.getItem("githubAccessToken")
         if (LStoken) {
           const response = await axios.get(
             "https://api.github.com/user/repos",
@@ -30,6 +32,9 @@ export default function Dashboard() {
           )
           setRepos(response.data)
           setFilteredRepos(response.data)
+        } else {
+          alert("Unauthorized, No token found")
+          router.push("/")
         }
       } catch (error) {
         setError("Failed to fetch repositories")
@@ -53,8 +58,6 @@ export default function Dashboard() {
       if (query) {
         setLoading(true)
         try {
-          if(LStoken){
-            
           const filtered = repos.filter((repo) =>
             repo.name.toLowerCase().includes(query.toLowerCase()),
           )
@@ -72,9 +75,6 @@ export default function Dashboard() {
           setFilteredRepos(
             filtered.length > 0 ? filtered : globalResponse.data.items,
           )
-          }else{
-            setError("Unauthorized Access, no token found")
-          }
         } catch (error) {
           setError("Failed to search repositories")
           console.error("Error searching repositories:", error)
@@ -137,7 +137,7 @@ export default function Dashboard() {
                   <a
                     href={`/repository/${repo.owner.login}/${repo.name}`}
                     onClick={(e) => {
-                      e.preventDefault() 
+                      e.preventDefault()
                       handleRepoClick(repo.owner.login, repo.name)
                     }}
                     style={{ color: "inherit", textDecoration: "none" }}
@@ -173,7 +173,7 @@ export default function Dashboard() {
                       <a
                         href={`/repository/${repo.owner.login}/${repo.name}`}
                         onClick={(e) => {
-                          e.preventDefault() 
+                          e.preventDefault()
                           handleRepoClick(repo.owner.login, repo.name)
                         }}
                         style={{ color: "inherit", textDecoration: "none" }}
