@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [globalRepos, setGlobalRepos] = useState([])
+  const [repoOwner, setRepoOwner] = useState("")
   const [LStoken, setLStoken] = useState(() =>
     localStorage.getItem("githubAccessToken"),
   )
@@ -20,22 +21,28 @@ export default function Dashboard() {
   const router = useRouter()
   useEffect(() => {
     const fetchRepos = async () => {
+      if (!LStoken) {
+        alert("Unauthorized, No token found")
+        router.push("/")
+        return
+      }
+
       try {
-        if (LStoken) {
-          const response = await axios.get(
-            "https://api.github.com/user/repos",
-            {
-              headers: {
-                Authorization: `token ${LStoken}`,
-              },
-            },
-          )
-          setRepos(response.data)
-          setFilteredRepos(response.data)
-        } else {
-          alert("Unauthorized, No token found")
-          router.push("/")
-        }
+        const userResponse = await axios.get("https://api.github.com/user", {
+          headers: { Authorization: `token ${LStoken}` },
+        })
+
+        setRepoOwner(userResponse.data.login)
+
+        const repoResponse = await axios.get(
+          "https://api.github.com/user/repos",
+          {
+            headers: { Authorization: `token ${LStoken}` },
+          },
+        )
+
+        setRepos(repoResponse.data)
+        setFilteredRepos(repoResponse.data)
       } catch (error) {
         setError("Failed to fetch repositories")
         console.error("Error fetching repositories:", error)
@@ -43,7 +50,7 @@ export default function Dashboard() {
     }
 
     fetchRepos()
-  }, [])
+  }, [LStoken])
 
   const debounce = (func, delay) => {
     let debounceTimer
@@ -187,7 +194,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div>
-          <MyStatsCard />
+          <MyStatsCard owner={repoOwner} />
         </div>
         <div>
           <ChatBot />
