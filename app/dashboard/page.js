@@ -15,10 +15,11 @@ export default function Dashboard() {
   const [globalRepos, setGlobalRepos] = useState([])
   const router = useRouter() // Initialize useRouter
 
+  let LStoken
   useEffect(() => {
     const fetchRepos = async () => {
       try {
-        const LStoken = localStorage.getItem("githubAccessToken")
+        LStoken = localStorage.getItem("githubAccessToken")
         if (LStoken) {
           const response = await axios.get(
             "https://api.github.com/user/repos",
@@ -53,8 +54,8 @@ export default function Dashboard() {
       if (query) {
         setLoading(true)
         try {
-          const LStoken = localStorage.getItem("githubAccessToken")
-          // Search user's repositories
+          if(LStoken){
+            // Search user's repositories
           const filtered = repos.filter((repo) =>
             repo.name.toLowerCase().includes(query.toLowerCase()),
           )
@@ -74,6 +75,9 @@ export default function Dashboard() {
           setFilteredRepos(
             filtered.length > 0 ? filtered : globalResponse.data.items,
           )
+          }else{
+            setError("Unauthorized Access, no token found")
+          }
         } catch (error) {
           setError("Failed to search repositories")
           console.error("Error searching repositories:", error)
