@@ -12,13 +12,14 @@ export default function PullReq() {
   const [error, setError] = useState(null)
   const [linkedIssueNumber, setLinkedIssueNumber] = useState(null)
 
-  const getGitHubToken = () => localStorage.getItem("githubAccessToken")
+  const [LStoken, setLStoken] = useState(() =>
+    localStorage.getItem("githubAccessToken"),
+  )
 
   useEffect(() => {
-    if (!owner || !repo) return;
+    if (!owner || !repo) return
 
     const fetchPullRequests = async () => {
-      const LStoken = getGitHubToken()
       if (!LStoken) return setError("GitHub access token not found."), false
 
       try {
@@ -28,8 +29,8 @@ export default function PullReq() {
             headers: {
               Authorization: `token ${LStoken}`,
             },
-          }
-        );
+          },
+        )
         if (!response.ok) {
           console.log("Failed to fetch pull requests")
         }
@@ -51,16 +52,14 @@ export default function PullReq() {
         setLoading(false)
       }
     }
-    fetchPullRequests();
-
+    fetchPullRequests()
   }, [owner, repo])
 
   useEffect(() => {
-    if (!linkedIssueNumber) return;
+    if (!linkedIssueNumber) return
 
     const fetchSuggestions = async () => {
-      if (!linkedIssueNumber) return;
-      const LStoken = getGitHubToken()
+      if (!linkedIssueNumber) return
       if (!LStoken) return setError("GitHub access token not found."), false
       try {
         const response = await fetch(
@@ -68,10 +67,10 @@ export default function PullReq() {
           {
             headers: {
               Authorization: `token ${LStoken}`,
-              'Accept': 'application/json',
+              Accept: "application/json",
             },
-          }
-        );
+          },
+        )
         if (!response.ok) {
           throw new Error(`Failed to fetch suggestions: ${response.status}`)
         }
@@ -124,7 +123,6 @@ export default function PullReq() {
         </div>
       </div>
 
-
       <div
         style={{
           margin: "0 auto",
@@ -132,15 +130,19 @@ export default function PullReq() {
           padding: "10px",
           background: "var(--button)",
           borderRadius: "8px",
-          border: "1px solid var(--divider)"
+          border: "1px solid var(--divider)",
         }}
       >
-        <h2 style={{ color: "var(--aqua)", marginBottom: "20px" }}>Suggested Pull Requests</h2>
+        <h2 style={{ color: "var(--aqua)", marginBottom: "20px" }}>
+          Suggested Pull Requests
+        </h2>
         {suggestions ? (
           <div style={{ display: "flex", flexDirection: "row", gap: "65px" }}>
             {suggestions.topPullRequest?.url && (
               <div>
-                <h3>Top Match (Score: {suggestions.topPullRequest.relevanceScore})</h3>
+                <h3>
+                  Top Match (Score: {suggestions.topPullRequest.relevanceScore})
+                </h3>
                 <Link href={suggestions.topPullRequest.url}>
                   {suggestions.topPullRequest.title}
                 </Link>
@@ -163,11 +165,10 @@ export default function PullReq() {
               </div>
             )}
           </div>
-        ) :
+        ) : (
           <p>Loading Suggestions ...</p>
-        }
+        )}
       </div>
-
 
       <div className={styles.IssuesTable}>
         <div style={{ color: "var(--aqua)" }}>
@@ -188,8 +189,7 @@ export default function PullReq() {
           }}
         ></div>
 
-        {pullRequests.length > 0 ?
-
+        {pullRequests.length > 0 ? (
           pullRequests.map((pr) => (
             <>
               <div
@@ -224,16 +224,13 @@ export default function PullReq() {
                   gridColumnEnd: 7,
                   // backgroundColor: "var(--divider)",
                 }}
-              >
-
-              </div>
+              ></div>
             </>
           ))
-          :
-          <div>Limit Exceeded</div>}
+        ) : (
+          <div>Limit Exceeded</div>
+        )}
       </div>
-
-
     </>
   )
 }

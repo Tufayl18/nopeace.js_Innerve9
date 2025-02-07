@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 import useWeb3Store from "@/store/useWeb3Store"
 
 export default function Issues() {
-  const { account, stakingContract, token, repoId, setRepoId } = useWeb3Store();
+  const { account, stakingContract, token, repoId, setRepoId } = useWeb3Store()
   const router = useRouter()
 
   const { owner, repo } = useParams()
@@ -20,29 +20,30 @@ export default function Issues() {
   const [filteredIssues, setFilteredIssues] = useState([])
   const [issueInfo, setIssueInfo] = useState({})
 
-  const getGitHubToken = () => localStorage.getItem("githubAccessToken")
+  // const getGitHubToken = () => localStorage.getItem("githubAccessToken")
+  const [LStoken, setLStoken] = useState(() =>
+    localStorage.getItem("githubAccessToken"),
+  )
 
   useEffect(() => {
     const fetchIssues = async () => {
       try {
-        const LStoken = getGitHubToken()
         if (!LStoken) return console.error("GitHub access token not found.")
 
-        const repoResponse = await fetch(
-          `https://api.github.com/repos/${owner}/${repo}`,
-          {
-            headers: {
-              Authorization: `token ${LStoken}`,
-            },
-          },
-        )
-        if (repoResponse.ok) {
-          const repoData = await repoResponse.json()
-          setRepoId(repoData?.id);
-          console.log("RepoID (zustand, response): ", repoId)
-        }
-        else console.error("Failed to fetch repo info:", repoResponse.statusText)
-
+        // const repoResponse = await fetch(
+        //   `https://api.github.com/repos/${owner}/${repo}`,
+        //   {
+        //     headers: {
+        //       Authorization: `token ${LStoken}`,
+        //     },
+        //   },
+        // )
+        // if (repoResponse.ok) {
+        //   const repoData = await repoResponse.json()
+        //   setRepoId(repoData?.id);
+        //   console.log("RepoID (zustand, response): ", repoId)
+        // }
+        // else console.error("Failed to fetch repo info:", repoResponse.statusText)
 
         const userResponse = await fetch(`https://api.github.com/user`, {
           headers: {
@@ -62,11 +63,14 @@ export default function Issues() {
         let issuesResponse
 
         do {
-          issuesResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues?page=${page}`, {
-            headers: {
-              Authorization: `token ${LStoken}`,
+          issuesResponse = await fetch(
+            `https://api.github.com/repos/${owner}/${repo}/issues?page=${page}`,
+            {
+              headers: {
+                Authorization: `token ${LStoken}`,
+              },
             },
-          })
+          )
 
           if (issuesResponse.ok) {
             const data = await issuesResponse.json()
@@ -82,14 +86,19 @@ export default function Issues() {
         )
 
         // Filter only open issues, ignoring PRs
-        const openIssues = allIssues.filter((issue) => !issue.pull_request && issue.state === "open")
+        const openIssues = allIssues.filter(
+          (issue) => !issue.pull_request && issue.state === "open",
+        )
         setIssues(openIssues)
         setFilteredIssues(openIssues)
 
         if (repoId) {
           const issueDetails = {}
           for (const issue of openIssues) {
-            issueDetails[issue.number] = await getIssueInfo(repoId, issue.number)
+            issueDetails[issue.number] = await getIssueInfo(
+              repoId,
+              issue.number,
+            )
           }
           setIssueInfo(issueDetails)
         }
@@ -133,17 +142,24 @@ export default function Issues() {
   const handleNewIssue = () => {
     if (authenticatedUser !== owner) {
       console.log(authenticatedUser, owner)
-      alert("You do not have permission to create issue currently. Only the repository owner can create it.")
+      alert(
+        "You do not have permission to create issue currently. Only the repository owner can create it.",
+      )
       return
     }
     router.push(`/repository/${owner}/${repo}/issues/new-issue`)
   }
   const handleCloseIssue = async (issueNumber) => {
-    if (authenticatedUser !== owner) return alert("You do not have permission to close this issue. Only the repository owner can close it.")
+    if (authenticatedUser !== owner)
+      return alert(
+        "You do not have permission to close this issue. Only the repository owner can close it.",
+      )
     if (confirm("Do you want to close this issue?")) {
       try {
         console.log(repoId, issueNumber)
-        const receipt = (await stakingContract.closeIssueNoSolver(repoId, issueNumber)).wait(2)
+        const receipt = (
+          await stakingContract.closeIssueNoSolver(repoId, issueNumber)
+        ).wait(2)
         if (receipt.status === 1) {
           console.log("Transaction was successful!")
 
@@ -171,7 +187,9 @@ export default function Issues() {
               prevIssues.filter((issue) => issue.number !== issueNumber),
             )
             setFilteredIssues((prevFilteredIssues) =>
-              prevFilteredIssues.filter((issue) => issue.number !== issueNumber),
+              prevFilteredIssues.filter(
+                (issue) => issue.number !== issueNumber,
+              ),
             )
             alert(`Issue #${issueNumber} closed successfully.`)
           } else {
@@ -184,13 +202,11 @@ export default function Issues() {
             )
             alert(errorData.message)
           }
-        }
-        else alert("Blockchain Transaction failed!")
+        } else alert("Blockchain Transaction failed!")
       } catch (error) {
         console.log("Error closing issue:", error)
       }
-    }
-    else return
+    } else return
   }
 
   const getIssueInfo = async (repoId, issueId) => {
@@ -208,7 +224,13 @@ export default function Issues() {
       }
     } catch (e) {
       console.error("Error fetching prize:", e)
-      return { prize: "0", stakeCount: 0, totalStakeAmount: "0", creator: "", solved: false }
+      return {
+        prize: "0",
+        stakeCount: 0,
+        totalStakeAmount: "0",
+        creator: "",
+        solved: false,
+      }
     }
   }
   return (
@@ -225,7 +247,12 @@ export default function Issues() {
         <div>
           Highest Win Prize{" "}
           <div style={{ color: "var(--aqua)", fontSize: 20 }}>
-            {Math.max(...Object.values(issueInfo).map(info => parseFloat(info?.prize || 0))).toFixed(2)} GST
+            {Math.max(
+              ...Object.values(issueInfo).map((info) =>
+                parseFloat(info?.prize || 0),
+              ),
+            ).toFixed(2)}{" "}
+            GST
           </div>
         </div>
 
@@ -245,7 +272,9 @@ export default function Issues() {
           ></input>
         </div>
         <div>
-          <button className={styles.ForkButton} onClick={handleNewIssue}>New Issue</button>
+          <button className={styles.ForkButton} onClick={handleNewIssue}>
+            New Issue
+          </button>
         </div>
       </div>
       <div className={styles.IssuesTable}>
@@ -284,10 +313,13 @@ export default function Issues() {
                     justifyContent: "left",
                   }}
                 >
-                  <Link href={`/repository/${owner}/${repo}/issues/${issue.number}`}>
+                  <Link
+                    href={`/repository/${owner}/${repo}/issues/${issue.number}`}
+                  >
                     <span style={{ color: "var(--aqua)", fontSize: 20 }}>
                       #{issue.number}
-                    </span> <br></br>
+                    </span>{" "}
+                    <br></br>
                     <span>{issue.title}</span>
                   </Link>
                   <div>
@@ -296,7 +328,10 @@ export default function Issues() {
                         key={label.id}
                         style={{
                           height: "fit-content",
-                          backgroundColor: label.name.toLowerCase() == "feature" ? 'rgb(106, 106, 106)' : `#${label.color}`,
+                          backgroundColor:
+                            label.name.toLowerCase() == "feature"
+                              ? "rgb(106, 106, 106)"
+                              : `#${label.color}`,
                           color: "white",
                           padding: "2px 5px",
                           borderRadius: "5px",
@@ -313,19 +348,17 @@ export default function Issues() {
                 <div style={{ textAlign: "center" }}>
                   {issueInfo[issue.number]?.creator
                     ? issueInfo[issue.number]?.creator.substring(0, 7) +
-                    "..." +
-                    issueInfo[issue.number]?.creator.substring(
-                      issueInfo[issue.number]?.creator.length - 3,
-                    )
-                    : "Unstaked"}<br></br>
-                  ({issue.user?.login})
+                      "..." +
+                      issueInfo[issue.number]?.creator.substring(
+                        issueInfo[issue.number]?.creator.length - 3,
+                      )
+                    : "Unstaked"}
+                  <br></br>({issue.user?.login})
                 </div>
+                <div>{issue.assignee ? issue.assignee.login : "--"}</div>
                 <div>
-                  {issue.assignee ? issue.assignee.login : "--"}
-                </div>
-                <div>
-                  {issueInfo[issue.number]?.stakeCount?.toString() || "0"}
-                  ({issueInfo[issue.number]?.totalStakeAmount || "0.0"} GST)
+                  {issueInfo[issue.number]?.stakeCount?.toString() || "0"}(
+                  {issueInfo[issue.number]?.totalStakeAmount || "0.0"} GST)
                 </div>
                 <div>
                   <button

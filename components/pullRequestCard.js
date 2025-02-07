@@ -8,26 +8,28 @@ import raise from "../app/assets/raise.png"
 import remove from "../app/assets/remove.png"
 import Image from "next/image"
 import styles from "../app/styles.module.css"
-import Web3Context from "@/context/Web3Context";
-import { ethers } from "ethers";
+import useWeb3Store from "@/store/useWeb3Store"
+import { ethers } from "ethers"
 
 export default function PullReqCard({ stakeholders }) {
   console.log(stakeholders)
 
-  const { provider, account, stakingContract, token, chainId } = useContext(Web3Context)
+  const { provider, account, stakingContract, token, chainId } = useWeb3Store()
   const { owner, repo, issue, pull } = useParams()
   const [authenticatedUser, setAuthenticatedUser] = useState(null)
   const [linkedPrs, setLinkedPrs] = useState([]) // Array to store multiple PRs
   const [repoId, setRepoId] = useState()
   const [issueId, setIssueId] = useState(issue)
   const [stakesData, setStakesData] = useState({})
+  const [LStoken, setLStoken] = useState(() =>
+    localStorage.getItem("githubAccessToken"),
+  )
 
   const handleMerge = (pullReqId) => {
     if (repoId && issueId && pullReqId) {
       try {
         // markSolved
-      }
-      catch (e) {
+      } catch (e) {
         console.log(e)
       }
     }
@@ -59,13 +61,9 @@ export default function PullReqCard({ stakeholders }) {
     }
   }*/
 
-
-
   useEffect(() => {
     const fetchUser = async () => {
-
       try {
-        const LStoken = localStorage.getItem("githubAccessToken")
         if (!LStoken) {
           console.error("GitHub access token not found.")
           return
@@ -90,7 +88,6 @@ export default function PullReqCard({ stakeholders }) {
 
     const fetchLinkedPRs = async () => {
       try {
-        const LStoken = localStorage.getItem("githubAccessToken")
         if (!LStoken) {
           console.error("GitHub access token not found.")
           return
@@ -156,19 +153,20 @@ export default function PullReqCard({ stakeholders }) {
       }
     }
 
-
     const fetchRepo = async () => {
       try {
-        const LStoken = localStorage.getItem("githubAccessToken")
         if (!LStoken) {
           console.error("GitHub access token not found.")
           return
         }
-        const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
-          headers: {
-            Authorization: `token ${LStoken}`,
+        const repoResponse = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}`,
+          {
+            headers: {
+              Authorization: `token ${LStoken}`,
+            },
           },
-        })
+        )
         if (repoResponse.ok) {
           const repoData = await repoResponse.json()
           const repoID = repoData?.id
@@ -177,7 +175,6 @@ export default function PullReqCard({ stakeholders }) {
         } else {
           console.error("Failed to fetch repo info:", repoResponse.statusText)
         }
-
       } catch (error) {
         console.log("Error", error)
       }
@@ -185,15 +182,12 @@ export default function PullReqCard({ stakeholders }) {
 
     if (account == 0 || !account || !token) {
       alert("Connect Wallet.")
-    }
-    else {
+    } else {
       fetchUser()
       fetchLinkedPRs()
       fetchRepo()
     }
-
   }, [issue, pull, repo, owner, account, token])
-
 
   // useEffect(() => {
   //   const fetchStakeDataForPRs = async () => {
@@ -269,7 +263,8 @@ export default function PullReqCard({ stakeholders }) {
               }}
             >
               <div style={{ color: "var(--aqua)" }}>
-                {data.user ? data.user.login : ""} ({stakesData[data.id]?.stakerAddress || "Loading..."})
+                {data.user ? data.user.login : ""} (
+                {stakesData[data.id]?.stakerAddress || "Loading..."})
               </div>
               <div>
                 Staked
@@ -283,7 +278,7 @@ export default function PullReqCard({ stakeholders }) {
                     fontSize: 20,
                   }}
                 >
-                  {stakesData[data.id]?.stakedAmount || "0"}  GST
+                  {stakesData[data.id]?.stakedAmount || "0"} GST
                 </span>
                 <span
                   style={{
@@ -324,7 +319,14 @@ export default function PullReqCard({ stakeholders }) {
                 {data.state === "closed" ? (
                   <div style={{ color: "var(--aqua)" }}> Closed </div>
                 ) : (
-                  <button className={styles.ForkButton} onClick={() => handleMerge(data?.id, stakesData[data.id]?.stakerAddress)}>Merge</button>
+                  <button
+                    className={styles.ForkButton}
+                    onClick={() =>
+                      handleMerge(data?.id, stakesData[data.id]?.stakerAddress)
+                    }
+                  >
+                    Merge
+                  </button>
                 )}
               </div>
             </div>

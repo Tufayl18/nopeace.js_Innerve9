@@ -2,11 +2,11 @@
 import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
 import styles from "../../../../../styles.module.css"
-import { ethers } from "ethers";
-import useWeb3Store from "@/store/useWeb3Store";
+import { ethers } from "ethers"
+import useWeb3Store from "@/store/useWeb3Store"
 
 export default function NewIssue() {
-  const { account, stakingContract, token, repoId } = useWeb3Store();
+  const { account, stakingContract, token, repoId } = useWeb3Store()
   const router = useRouter()
   const { owner, repo } = useParams()
 
@@ -18,26 +18,13 @@ export default function NewIssue() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  const getGitHubToken = () => localStorage.getItem("githubAccessToken")
+  const [LStoken, setLStoken] = useState(() =>
+    localStorage.getItem("githubAccessToken"),
+  )
 
   const checkDuplicateIssue = async () => {
     try {
-      const LStoken = getGitHubToken()
       if (!LStoken) return setError("GitHub access token not found."), false
-
-      const response = await fetch(
-        `https://muj-gitstakeai.onrender.com/api/avoidDUp/${owner}/${repo}`,
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${LStoken}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ title, body: description })
-        }
-      )
-      return (response.ok) ? (await response.json()).message.includes("Similar") : false;
-
     } catch (error) {
       console.error("Error checking for duplicates:", error)
       return false
@@ -46,20 +33,22 @@ export default function NewIssue() {
 
   const handleCreateIssue = async () => {
     console.log("In handleCreateIssue...")
-    if (!title.trim() || !description.trim()) return setError("Title and description are required.")
+    if (!title.trim() || !description.trim())
+      return setError("Title and description are required.")
 
     setLoading(true)
     setError(null)
 
     try {
       if (await checkDuplicateIssue()) {
-        setError("A similar issue already exists. Please check existing issues.")
+        setError(
+          "A similar issue already exists. Please check existing issues.",
+        )
         setLoading(false)
         return
       }
-
-      const LStoken = getGitHubToken()
-      if (!LStoken) return setError("GitHub access token not found."), setLoading(false)
+      if (!LStoken)
+        return setError("GitHub access token not found."), setLoading(false)
 
       // const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
       //   headers: {
@@ -68,7 +57,7 @@ export default function NewIssue() {
       // })
       // const repoData = (repoResponse.ok) ? await repoResponse.json() : null;
       // const repoId = repoData?.id;
-      if (!repoId) throw new Error("Failed to fetch repository ID.");
+      if (!repoId) throw new Error("Failed to fetch repository ID.")
 
       const response = await fetch(
         `https://api.github.com/repos/${owner}/${repo}/issues`,
@@ -93,27 +82,30 @@ export default function NewIssue() {
 
         if (data && repoId) {
           try {
-            console.log("creatingIssue...", stakingContract.target, token.target, account, repoId, data?.number, ethers.parseEther(ethPrize.toString()))
+            console.log(
+              "creatingIssue...",
+              stakingContract.target,
+              token.target,
+              account,
+              repoId,
+              data?.number,
+              ethers.parseEther(ethPrize.toString()),
+            )
             if (token && account) {
               const tx = await stakingContract.createIssue(
                 repoId,
                 data?.number,
-                ethers.parseEther(ethPrize.toString())
-              );
-              await tx.wait();
+                ethers.parseEther(ethPrize.toString()),
+              )
+              await tx.wait()
             }
-          }
-          catch (error) {
+          } catch (error) {
             console.log("create issue:", error)
           }
           router.push(`/repository/${owner}/${repo}/issues`)
-        }
-        else setError("Issue ID was not generated.")
-
+        } else setError("Issue ID was not generated.")
       } else setError(`Failed to create issue: ${response}`)
-
-    }
-    catch (error) {
+    } catch (error) {
       setError(`An error occurred: ${error}`)
     } finally {
       setLoading(false)
@@ -121,8 +113,8 @@ export default function NewIssue() {
   }
 
   const handleInputChange = async (field, value) => {
-    if (field === 'title') setTitle(value)
-    if (field === 'description') setDescription(value)
+    if (field === "title") setTitle(value)
+    if (field === "description") setDescription(value)
   }
 
   return (
@@ -163,7 +155,7 @@ export default function NewIssue() {
           <input
             placeholder="Title"
             value={title}
-            onChange={(e) => handleInputChange('title', e.target.value)}
+            onChange={(e) => handleInputChange("title", e.target.value)}
             style={{
               color: "var(--font)",
               padding: "0 5px",
@@ -201,7 +193,7 @@ export default function NewIssue() {
           <textarea
             placeholder="Add your description here..."
             value={description}
-            onChange={(e) => handleInputChange('description', e.target.value)}
+            onChange={(e) => handleInputChange("description", e.target.value)}
             style={{
               minHeight: 150,
               color: "var(--font)",
