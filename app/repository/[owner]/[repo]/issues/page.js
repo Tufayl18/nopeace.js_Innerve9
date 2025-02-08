@@ -30,20 +30,20 @@ export default function Issues() {
       try {
         if (!LStoken) return console.error("GitHub access token not found.")
 
-        // const repoResponse = await fetch(
-        //   `https://api.github.com/repos/${owner}/${repo}`,
-        //   {
-        //     headers: {
-        //       Authorization: `token ${LStoken}`,
-        //     },
-        //   },
-        // )
-        // if (repoResponse.ok) {
-        //   const repoData = await repoResponse.json()
-        //   setRepoId(repoData?.id);
-        //   console.log("RepoID (zustand, response): ", repoId)
-        // }
-        // else console.error("Failed to fetch repo info:", repoResponse.statusText)
+        const repoResponse = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}`,
+          {
+            headers: {
+              Authorization: `token ${LStoken}`,
+            },
+          },
+        )
+        if (repoResponse.ok) {
+          const repoData = await repoResponse.json()
+          setRepoId(repoData?.id)
+          console.log("RepoID (zustand, response): ", repoId)
+        } else
+          console.error("Failed to fetch repo info:", repoResponse.statusText)
 
         const userResponse = await fetch(`https://api.github.com/user`, {
           headers: {

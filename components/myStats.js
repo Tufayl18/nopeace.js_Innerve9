@@ -11,7 +11,7 @@ export default function MyStatsCard({ owner }) {
   const CONTRACT_FUNDS = "20"
   const INITIAL_AMT = ethers.parseUnits("10", 18)
 
-  const { account, stakingContract, token } = useWeb3Store()
+  const { provider, account, stakingContract, token } = useWeb3Store()
   const [isDepolyer, setIsDepolyer] = useState(false)
 
   const [txStatus, setTxStatus] = useState()

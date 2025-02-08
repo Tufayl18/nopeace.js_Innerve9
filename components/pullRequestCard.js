@@ -14,11 +14,12 @@ import { ethers } from "ethers"
 export default function PullReqCard({ stakeholders }) {
   console.log(stakeholders)
 
-  const { provider, account, stakingContract, token, chainId } = useWeb3Store()
+  const { provider, account, stakingContract, token, chainId, repoId } =
+    useWeb3Store()
   const { owner, repo, issue, pull } = useParams()
   const [authenticatedUser, setAuthenticatedUser] = useState(null)
   const [linkedPrs, setLinkedPrs] = useState([]) // Array to store multiple PRs
-  const [repoId, setRepoId] = useState()
+  // const [repoId, setRepoId] = useState()
   const [issueId, setIssueId] = useState(issue)
   const [stakesData, setStakesData] = useState({})
   const [LStoken, setLStoken] = useState(() =>
@@ -153,32 +154,32 @@ export default function PullReqCard({ stakeholders }) {
       }
     }
 
-    const fetchRepo = async () => {
-      try {
-        if (!LStoken) {
-          console.error("GitHub access token not found.")
-          return
-        }
-        const repoResponse = await fetch(
-          `https://api.github.com/repos/${owner}/${repo}`,
-          {
-            headers: {
-              Authorization: `token ${LStoken}`,
-            },
-          },
-        )
-        if (repoResponse.ok) {
-          const repoData = await repoResponse.json()
-          const repoID = repoData?.id
-          setRepoId(repoData?.id)
-          console.log(repoID)
-        } else {
-          console.error("Failed to fetch repo info:", repoResponse.statusText)
-        }
-      } catch (error) {
-        console.log("Error", error)
-      }
-    }
+    // const fetchRepo = async () => {
+    //   try {
+    //     if (!LStoken) {
+    //       console.error("GitHub access token not found.")
+    //       return
+    //     }
+    //     const repoResponse = await fetch(
+    //       `https://api.github.com/repos/${owner}/${repo}`,
+    //       {
+    //         headers: {
+    //           Authorization: `token ${LStoken}`,
+    //         },
+    //       },
+    //     )
+    //     if (repoResponse.ok) {
+    //       const repoData = await repoResponse.json()
+    //       const repoID = repoData?.id
+    //       setRepoId(repoData?.id)
+    //       console.log(repoID)
+    //     } else {
+    //       console.error("Failed to fetch repo info:", repoResponse.statusText)
+    //     }
+    //   } catch (error) {
+    //     console.log("Error", error)
+    //   }
+    // }
 
     if (account == 0 || !account || !token) {
       alert("Connect Wallet.")

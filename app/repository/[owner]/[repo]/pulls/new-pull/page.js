@@ -10,8 +10,7 @@ import { ethers } from "ethers"
 import axios from "axios"
 
 export default function NewPullReq() {
-  const { provider, account, stakingContract, token, chainId, repoId } =
-    useWeb3Store()
+  const { account, stakingContract, repoId } = useWeb3Store()
   const { owner, repo } = useParams()
 
   const [forkedBranches, setForkedBranches] = useState([])
@@ -63,6 +62,7 @@ export default function NewPullReq() {
     }
 
     const fetchUserBranches = async () => {
+      console.log("in fetchUserBranches:", repo)
       try {
         if (!LStoken) {
           console.error("GitHub access token not found.")
@@ -78,6 +78,8 @@ export default function NewPullReq() {
         if (userResponse.ok) {
           const userData = await userResponse.json()
           setAuthenticatedUser(userData.login)
+          console.log("in fetchUserBranches userResponse:", userData.login)
+
           const response = await fetch(
             `https://api.github.com/repos/${userData.login}/${repo}/branches`,
             {
@@ -105,9 +107,12 @@ export default function NewPullReq() {
         console.error("Error:", error)
       }
     }
-
-    fetchBaseBranches()
-    fetchUserBranches()
+    if (repoId) {
+      fetchBaseBranches()
+      fetchUserBranches()
+    } else {
+      alert("No RepoId")
+    }
   }, [owner, repo])
 
   const handleCreatePullRequest = async () => {
@@ -135,7 +140,6 @@ export default function NewPullReq() {
         body: finalDescription,
       }
       console.log("Req body", requestBody)
-
 
       // Fetch the commit SHA from the latest commit on the selected forked branch
       // const commitResponse = await fetch(
@@ -190,6 +194,15 @@ export default function NewPullReq() {
 
       const issueNumberWithoutHash = issueNumber.replace("#", "") // Remove the '#' symbol
       const issueNumberInt = parseInt(issueNumberWithoutHash)
+
+      console.log(
+        "stakingContract: ",
+        stakingContract,
+        repoId,
+        issueNumberInt,
+        pullRequestId,
+        ethers.parseEther(stakePrize.toString()),
+      )
 
       const tx = await stakingContract.stakeOnIssue(
         repoId,
