@@ -56,7 +56,7 @@ export default function PullReq() {
 
     fetchStakeData()
   }, [repoId, linkedIssueNumber, pullRequests, stakingContract])
-
+  console.log("Stake data", stakeData)
   useEffect(() => {
     if (!owner || !repo) return
 
@@ -77,7 +77,6 @@ export default function PullReq() {
         }
         const data = await response.json()
         setPullRequests(data)
-        console.log(data)
 
         // Extract issue number from the first PR that has a linked issue
         for (const pr of data) {
