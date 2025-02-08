@@ -4,7 +4,7 @@ import Image from "next/image"
 import merge from "../../../../../assets/merge.png"
 import tick from "../../../../../assets/tick.png"
 import { useParams } from "next/navigation"
-import { useEffect, useState, useContext } from "react"
+import { useEffect, useState } from "react"
 import useWeb3Store from "@/store/useWeb3Store"
 import { ethers } from "ethers"
 import axios from "axios"
@@ -111,12 +111,13 @@ export default function NewPullReq() {
   }, [owner, repo])
 
   const handleCreatePullRequest = async () => {
+    console.log("In handleCreatePullRequest:", LStoken, repoId)
     setLoading(true)
     setError(null)
     setSuccess(false)
 
     try {
-      const LStoken = localStorage.getItem("githubAccessToken")
+      console.log("Helloe")
       if (!LStoken) {
         setError("Missing GitHub token")
         setLoading(false)
@@ -133,30 +134,32 @@ export default function NewPullReq() {
         base: selectedBaseBranch,
         body: finalDescription,
       }
+      console.log("Req body", requestBody)
+
 
       // Fetch the commit SHA from the latest commit on the selected forked branch
-      const commitResponse = await fetch(
-        `https://api.github.com/repos/${authenticatedUser}/${repo}/commits/${selectedForkedBranch}`,
-        {
-          headers: {
-            Authorization: `token ${LStoken}`,
-          },
-        },
-      )
-      const commitData = await commitResponse.json()
-      const commitSha = commitData.sha
+      // const commitResponse = await fetch(
+      //   `https://api.github.com/repos/${authenticatedUser}/${repo}/commits/${selectedForkedBranch}`,
+      //   {
+      //     headers: {
+      //       Authorization: `token ${LStoken}`,
+      //     },
+      //   },
+      // )
+      // const commitData = await commitResponse.json()
+      // const commitSha = commitData.sha
 
       // Perform the plagiarism check
-      const plagiarismResponse = await axios.get(
-        `https://muj-gitstakeai.onrender.com/api/plagiarism/${owner}/${repo}/${issueNumber}/${title}/${commitSha}`,
-      )
-      const plagiarismScore = plagiarismResponse.data.score
+      // const plagiarismResponse = await axios.get(
+      //   `https://muj-gitstakeai.onrender.com/api/plagiarism/${owner}/${repo}/${issueNumber}/${title}/${commitSha}`,
+      // )
+      // const plagiarismScore = plagiarismResponse.data.score
 
-      if (plagiarismScore >= 0.8) {
-        setError("Plagiarism score is too high. PR cannot be merged.")
-        setLoading(false)
-        return
-      }
+      // if (plagiarismScore >= 0.8) {
+      //   setError("Plagiarism score is too high. PR cannot be merged.")
+      //   setLoading(false)
+      //   return
+      // }
 
       // Making a POST request to GitHub API for creating a pull request
       const response = await fetch(
@@ -170,6 +173,7 @@ export default function NewPullReq() {
           body: JSON.stringify(requestBody),
         },
       )
+      console.log("pull respone", response)
 
       if (!response.ok) {
         const errorData = await response.json()
