@@ -186,7 +186,6 @@ export default function PullReqCard({ stakeholders }) {
     } else {
       fetchUser()
       fetchLinkedPRs()
-      fetchRepo()
     }
   }, [issue, pull, repo, owner, account, token])
 

@@ -28,6 +28,7 @@ export default function Issue() {
   const [stakeholders, setStakeholders] = useState([])
 
   let issueId = issue
+  console.log(issueId)
   // let repoId;
 
   useEffect(() => {
@@ -52,7 +53,7 @@ export default function Issue() {
         //   console.error("Failed to fetch repo info:", repoResponse.statusText)
         // }
 
-        if ((repoId, issueId)) {
+        if (repoId && issueId) {
           console.log(repoId)
           const [
             winPrize,
@@ -60,10 +61,10 @@ export default function Issue() {
             totalStakeAmount,
             highestAmt,
             highestStakeBy,
-          ] = await getIssueInfo(repoId, issue.number)
+          ] = await getIssueInfo(repoId, issueId)
           setIssueInfo((prev) => ({
             ...prev,
-            [issue.number]: {
+            [issueId]: {
               prize: winPrize,
               stakeCount,
               totalStakeAmount,
@@ -118,7 +119,7 @@ export default function Issue() {
       const approxAmtWei = ethers.parseEther(inputAmount)
 
       if (stakingContract && stakingContract.getEstDeductionRateOnIssue) {
-        const deductionRate = stakingContract.getEstDeductionRateOnIssue(
+        const deductionRate = await stakingContract.getEstDeductionRateOnIssue(
           repoId,
           issueId,
           approxAmtWei,

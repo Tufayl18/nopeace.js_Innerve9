@@ -2,7 +2,7 @@
 import Link from "next/link"
 import styles from "../../../../styles.module.css"
 import { useParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import useWeb3Store from "@/store/useWeb3Store"
 
 export default function PullReq() {
@@ -18,6 +18,44 @@ export default function PullReq() {
   )
 
   const { account, stakingContract, token, repoId } = useWeb3Store()
+  const [stakeData, setStakeData] = useState({})
+
+  useEffect(() => {
+    const fetchStakeData = async () => {
+      if (
+        !repoId ||
+        !linkedIssueNumber ||
+        !pullRequests.length ||
+        !stakingContract
+      )
+        return
+
+      const data = {}
+      for (let i = 0; i < pullRequests.length; i++) {
+        try {
+          const stakeInfo = await stakingContract.getStake(
+            repoId,
+            linkedIssueNumber,
+            i,
+          )
+          data[pullRequests[i].id] = {
+            pullReqIndex: stakeInfo[0],
+            pullReqId: stakeInfo[1],
+            staker: stakeInfo[2].toString(),
+            stakedAmt: GSTers.formatGSTer(stakeInfo[3], 18),
+          }
+        } catch (error) {
+          console.error(
+            `Error fetching stake for PR ${pullRequests[i].id}:`,
+            error,
+          )
+        }
+      }
+      setStakeData(data) // Store fetched stake data in state
+    }
+
+    fetchStakeData()
+  }, [repoId, linkedIssueNumber, pullRequests, stakingContract])
 
   useEffect(() => {
     if (!owner || !repo) return
@@ -39,6 +77,7 @@ export default function PullReq() {
         }
         const data = await response.json()
         setPullRequests(data)
+        console.log(data)
 
         // Extract issue number from the first PR that has a linked issue
         for (const pr of data) {
@@ -275,54 +314,46 @@ export default function PullReq() {
         )} */}
 
         {pullRequests.length > 0 ? (
-          pullRequests.map((pr, i) => (
-            <React.Fragment key={pr.id}>
-              {getPullsInfo(repoId, issueId, i).then((stakeInfo) => {
-                if (stakeInfo.pullReqId !== 0) {
-                  return (
-                    <div
-                      style={{
-                        paddingLeft: 20,
-                        display: "flex",
-                        margin: 0,
-                        flexDirection: "column",
-                        justifyContent: "left",
-                      }}
-                    >
-                      <Link
-                        href={`/repository/${owner}/${repo}/pulls/${pr.number}`}
-                      >
-                        <span style={{ color: "var(--aqua)", fontSize: 20 }}>
-                          #{pr.number}
-                        </span>
-                      </Link>{" "}
-                      <Link
-                        href={`/repository/${owner}/${repo}/pulls/${pr.number}`}
-                      >
-                        {pr.title}
-                      </Link>
-                      <span>Posted by {pr.user.login}</span>
-                      <div>{stakeInfo.stakedAmt} GST</div>
-                      <div>{pr.milestone ? pr.milestone.title : "None"}</div>
-                      <div>
-                        {pr.assignee ? pr.assignee.login : "Unassigned"}
-                      </div>
-                      <div>{stakeInfo.pullReqIndex}</div>
-                      <div>{pr.review_comments}</div>
-                      <div
-                        style={{
-                          height: 0.1,
-                          gridColumnStart: 1,
-                          gridColumnEnd: 7,
-                        }}
-                      ></div>
-                    </div>
-                  )
-                }
-                return null
-              })}
-            </React.Fragment>
-          ))
+          pullRequests.map((pr) => {
+            const stakeInfo = stakeData[pr.id]
+
+            if (!stakeInfo || stakeInfo.pullReqId === 0) return null
+
+            return (
+              <div
+                key={pr.id}
+                style={{
+                  paddingLeft: 20,
+                  display: "flex",
+                  margin: 0,
+                  flexDirection: "column",
+                  justifyContent: "left",
+                }}
+              >
+                <Link href={`/repository/${owner}/${repo}/pulls/${pr.number}`}>
+                  <span style={{ color: "var(--aqua)", fontSize: 20 }}>
+                    #{pr.number}
+                  </span>
+                </Link>{" "}
+                <Link href={`/repository/${owner}/${repo}/pulls/${pr.number}`}>
+                  {pr.title}
+                </Link>
+                <span>Posted by {pr.user.login}</span>
+                <div>{stakeInfo.stakedAmt} GST</div>
+                <div>{pr.milestone ? pr.milestone.title : "None"}</div>
+                <div>{pr.assignee ? pr.assignee.login : "Unassigned"}</div>
+                <div>{stakeInfo.pullReqIndex}</div>
+                <div>{pr.review_comments}</div>
+                <div
+                  style={{
+                    height: 0.1,
+                    gridColumnStart: 1,
+                    gridColumnEnd: 7,
+                  }}
+                ></div>
+              </div>
+            )
+          })
         ) : (
           <p>No pull requests found.</p>
         )}
